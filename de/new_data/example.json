@@ -1,0 +1,27 @@
+{
+  "sessions": [
+    {
+      "session_id": "test_001",
+      "client_id": 123456.0,
+      "visit_date": "2022-01-15",
+      "visit_time": "14:30:00",
+      "visit_number": 1,
+      "utm_source": "test_source",
+      "utm_medium": "organic",
+      "utm_campaign": "test_campaign",
+      "device_category": "desktop",
+      "geo_country": "Russia",
+      "geo_city": "Moscow"
+    }
+  ],
+  "hits": [
+    {
+      "session_id": "test_001",
+      "hit_date": "2022-01-15",
+      "hit_time": 14.5,
+      "hit_number": 1,
+      "hit_type": "event",
+      "event_action": "sub_car_claim_click"
+    }
+  ]
+}
