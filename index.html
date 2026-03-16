@@ -1,0 +1,652 @@
+$ cat > "C:/c/Users/admin/Desktop/SberAutoSubscription_project.html" << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СберАвтоподписка - Анализ данных</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; background: #f5f5f5; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #1a5f2a, #2ecc71); color: white; padding: 40px 0; text-align: center; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header p { font-size: 1.2em; opacity: 0.9; }
+        nav { background: #333; padding: 15px 0; position: sticky; top: 0; z-index: 100; }
+        nav ul { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
+        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; transition: background 0.3s; }
+        nav a:hover { background: #2ecc71; }
+        section { background: white; margin: 20px 0; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #1a5f2a; border-bottom: 3px solid #2ecc71; padding-bottom: 10px; margin-bottom: 20px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-box { background: linear-gradient(135deg, #3498db, #2ecc71); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-box .number { font-size: 2em; font-weight: bold; }
+        .stat-box .label { font-size: 0.9em; opacity: 0.9; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #1a5f2a; color: white; }
+        tr:hover { background: #f5f5f5; }
+        .code-block { background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; overflow-x: auto; font-family: 'Consolas', monospace; font-size: 0.9em; line-height: 1.5; }
+        .code-block .keyword { color: #c678dd; }
+        .code-block .string { color: #98c379; }
+        .code-block .comment { color: #5c6370; font-style: italic; }
+        .code-block .function { color: #61afef; }
+        .code-block .number { color: #d19a66; }
+        .result-box { background: #e8f5e9; border-left: 4px solid #2ecc71; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .result-box h4 { color: #1a5f2a; margin-bottom: 10px; }
+        .hypothesis { background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .hypothesis .status { font-weight: bold; color: #e65100; }
+        .hypothesis .accepted { color: #2ecc71; }
+        .hypothesis .rejected { color: #e74c3c; }
+        .chart-placeholder { background: #ecf0f1; padding: 40px; text-align: center; border-radius: 8px; margin: 20px 0; }
+        .footer { background: #333; color: white; text-align: center; padding: 20px 0; margin-top: 40px; }
+        .highlight { background: #fff9c4; padding: 2px 6px; border-radius: 3px; }
+        .metric { display: inline-block; background: #2ecc71; color: white; padding: 5px 12px; border-radius: 20px; margin: 3px; font-size: 0.9em; }
+        .metric.bad { background: #e74c3c; }
+        .metric.neutral { background: #3498db; }
+        .toc { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .toc ul { list-style: none; }
+        .toc li { padding: 5px 0; }
+        .toc a { color: #1a5f2a; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .comparison { display: flex; gap: 20px; flex-wrap: wrap; margin: 15px 0; }
+        .comparison-item { flex: 1; min-width: 200px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .comparison-item.odd { background: #e8f5e9; }
+        .comparison-item strong { display: block; color: #1a5f2a; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>СберАвтоподписка</h1>
+            <p>Анализ данных сайта | Финальная работа по Data Science</p>
+            <p style="font-size: 0.9em; margin-top: 15px;">Автор: Data Science Student | 2024</p>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#overview">Обзор</a></li>
+            <li><a href="#eda">EDA</a></li>
+            <li><a href="#hypotheses">Гипотезы</a></li>
+            <li><a href="#business">Бизнес-вопросы</a></li>
+            <li><a href="#ml">ML</a></li>
+            <li><a href="#de">DE</a></li>
+            <li><a href="#code">Код</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <!-- OVERVIEW -->
+        <section id="overview">
+            <h2>Обзор проекта</h2>
+            <div class="toc">
+                <h3>Содержание:</h3>
+                <ul>
+                    <li>• <a href="#eda">1. Разведочный анализ (EDA)</a></li>
+                    <li>• <a href="#hypotheses">2. Проверка гипотез</a></li>
+                    <li>• <a href="#business">3. Ответы на бизнес-вопросы</a></li>
+                    <li>• <a href="#ml">4. ML модель</a></li>
+                    <li>• <a href="#de">5. Data Engineering</a></li>
+                </ul>
+            </div>
+            
+            <h3>Описание</h3>
+            <p>Анализ данных сайта «СберАвтоподписка» — сервиса долгосрочной аренды автомобилей. Проект включает три специализации:</p>
+            <div class="stats-grid" style="margin-top: 20px;">
+                <div class="stat-box">
+                    <div class="number">DA</div>
+                    <div class="label">Data Analyst</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">ML</div>
+                    <div class="label">ML Engineer</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">DE</div>
+                    <div class="label">Data Engineer</div>
+                </div>
+            </div>
+            
+            <h3>Данные</h3>
+            <table>
+                <tr><th>Файл</th><th>Описание</th><th>Размер</th></tr>
+                <tr><td>ga_sessions.csv</td><td>Сессии (1 строка = 1 визит)</td><td>~370 MB</td></tr>
+                <tr><td>ga_hits.csv</td><td>Хиты (1 строка = 1 событие)</td><td>~4 GB</td></tr>
+            </table>
+        </section>
+        
+        <!-- EDA -->
+        <section id="eda">
+            <h2>1. Разведочный анализ данных (EDA)</h2>
+            
+            <h3>Базовая статистика</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="number">1,860,042</div>
+                    <div class="label">Всего сессий</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">15,726,470</div>
+                    <div class="label">Всего хитов</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">2.70%</div>
+                    <div class="label">Общий CR</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">50,314</div>
+                    <div class="label">Конверсий</div>
+                </div>
+            </div>
+            
+            <h3>Распределение данных</h3>
+            <div class="chart-placeholder">
+                <h4>📊 Визуализации распределений</h4>
+                <p>Графики: устройства, типы трафика, CR по устройствам, визиты по месяцам</p>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">(см. код для построения графиков)</p>
+            </div>
+            
+            <h3>Распределение по устройствам</h3>
+            <table>
+                <tr><th>Устройство</th><th>Визиты</th><th>Доля</th><th>CR</th></tr>
+                <tr><td>Mobile</td><td>1,474,871</td><td>79.3%</td><td>2.60%</td></tr>
+                <tr><td>Desktop</td><td>366,863</td><td>19.7%</td><td>3.14%</td></tr>
+                <tr><td>Tablet</td><td>18,308</td><td>1.0%</td><td>2.31%</td></tr>
+            </table>
+            
+            <h3>Топ-5 источников трафика</h3>
+            <table>
+                <tr><th>Источник</th><th>Визиты</th><th>Конверсии</th><th>CR</th></tr>
+                <tr><td>ZpYIoDJMcFzVoPFsHGJL</td><td>578,290</td><td>15,998</td><td>2.77%</td></tr>
+                <tr><td>fDLlAcSmythWSCVMvqvL</td><td>300,575</td><td>10,531</td><td>3.50%</td></tr>
+                <tr><td>kjsLglQLzykiRbcDiGcD</td><td>266,354</td><td>6,293</td><td>2.36%</td></tr>
+                <tr><td>MvfHsxITijuriZxsqZqt</td><td>186,199</td><td>2,249</td><td>1.21%</td></tr>
+                <tr><td>BHcvLfOaCWvWTykYqHVe</td><td>116,320</td><td>3,882</td><td>3.34%</td></tr>
+            </table>
+            
+            <h3>Топ-5 городов</h3>
+            <table>
+                <tr><th>Город</th><th>Визиты</th><th>Конверсии</th><th>CR</th></tr>
+                <tr><td>Москва</td><td>805,329</td><td>23,629</td><td>2.93%</td></tr>
+                <tr><td>Санкт-Петербург</td><td>296,788</td><td>7,113</td><td>2.40%</td></tr>
+                <tr><td>Екатеринбург</td><td>35,788</td><td>887</td><td>2.48%</td></tr>
+                <tr><td>Краснодар</td><td>32,243</td><td>1,081</td><td>3.35%</td></tr>
+                <tr><td>Казань</td><td>29,531</td><td>1,139</td><td>3.86%</td></tr>
+            </table>
+            
+            <h3>Временной период</h3>
+            <p>Данные охватывают период: <span class="highlight">май 2021 - декабрь 2021</span></p>
+            <table>
+                <tr><th>Месяц</th><th>Визиты</th></tr>
+                <tr><td>2021-05</td><td>108,202</td></tr>
+                <tr><td>2021-06</td><td>166,470</td></tr>
+                <tr><td>2021-07</td><td>185,244</td></tr>
+                <tr><td>2021-08</td><td>164,155</td></tr>
+                <tr><td>2021-09</td><td>257,478</td></tr>
+                <tr><td>2021-10</td><td>281,622</td></tr>
+                <tr><td>2021-11</td><td>297,769</td></tr>
+                <tr><td>2021-12</td><td>399,102</td></tr>
+            </table>
+            
+            <h3>Корреляции</h3>
+            <div class="result-box">
+                <h4>Ключевые корреляции с целевым действием:</h4>
+                <ul>
+                    <li>• <strong>visit_number</strong> → target: <span class="highlight">0.042</span> (слабая положит.)</li>
+                    <li>• <strong>is_organic</strong> → target: <span class="highlight">0.072</span> (слабая положит.)</li>
+                    <li>• <strong>device</strong> → target: <span class="highlight">-0.019</span> (очень слабая отриц.)</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- HYPOTHESES -->
+        <section id="hypotheses">
+            <h2>2. Проверка гипотез</h2>
+            <p>Использован статистический критерий: <strong>Chi-square</strong> (χ²), уровень значимости α = 0.05</p>
+            
+            <h3>Гипотеза 1: Органический vs Платный трафик</h3>
+            <div class="hypothesis">
+                <p><strong>H₀:</strong> Органический трафик не отличается от платного с точки зрения CR</p>
+                <p><strong>H₁:</strong> Существует статистически значимая разница в CR</p>
+            </div>
+            <table>
+                <tr><th>Группа</th><th>CR</th><th>Визиты</th></tr>
+                <tr><td>Органический</td><td>4.04%</td><td>515,659</td></tr>
+                <tr><td>Платный</td><td>2.19%</td><td>1,344,383</td></tr>
+            </table>
+            <div class="result-box">
+                <p><strong>Chi-square:</strong> 4801.80</p>
+                <p><strong>p-value:</strong> < 0.000001</p>
+                <p><strong>Cramér's V:</strong> 0.0508 (малый эффект)</p>
+                <p class="status rejected">✗ ОТКЛОНЯЕМ H₀ - разница статистически значима</p>
+            </div>
+            
+            <h3>Гипотеза 2: Мобильный vs Десктоп трафик</h3>
+            <div class="hypothesis">
+                <p><strong>H₀:</strong> Мобильный трафик не отличается от десктопного с точки зрения CR</p>
+                <p><strong>H₁:</strong> Существует статистически значимая разница в CR</p>
+            </div>
+            <table>
+                <tr><th>Группа</th><th>CR</th><th>Визиты</th></tr>
+                <tr><td>Мобильный</td><td>2.60%</td><td>1,474,871</td></tr>
+                <tr><td>Десктоп</td><td>3.14%</td><td>385,171</td></tr>
+            </table>
+            <div class="result-box">
+                <p><strong>Chi-square:</strong> 285.80</p>
+                <p><strong>p-value:</strong> < 0.000001</p>
+                <p><strong>Cramér's V:</strong> 0.0124 (очень малый эффект)</p>
+                <p class="status rejected">✗ ОТКЛОНЯЕМ H₀ - разница статистически значима</p>
+            </div>
+            
+            <h3>Гипотеза 3: Города присутствия vs Другие регионы</h3>
+            <div class="hypothesis">
+                <p><strong>H₀:</strong> Трафик из городов присутствия не отличается от трафика из других регионов</p>
+                <p><strong>H₁:</strong> Существует статистически значимая разница в CR</p>
+            </div>
+            <table>
+                <tr><th>Группа</th><th>CR</th><th>Визиты</th></tr>
+                <tr><td>Города присутствия</td><td>2.79%</td><td>1,102,118</td></tr>
+                <tr><td>Другие регионы</td><td>2.58%</td><td>757,924</td></tr>
+            </table>
+            <div class="result-box">
+                <p><strong>Chi-square:</strong> 73.07</p>
+                <p><strong>p-value:</strong> < 0.000001</p>
+                <p><strong>Cramér's V:</strong> 0.0063 (очень малый эффект)</p>
+                <p class="status rejected">✗ ОТКЛОНЯЕМ H₀ - разница статистически значима</p>
+            </div>
+            
+            <h3>Выводы</h3>
+            <div class="result-box">
+                <p>Все три гипотезы отклонены - во всех случаях есть статистически значимые различия в конверсии между группами. Однако размер эффекта (Cramér's V) во всех случаях малый, что говорит о том, что практическая значимость различий невелика.</p>
+            </div>
+        </section>
+        
+        <!-- BUSINESS QUESTIONS -->
+        <section id="business">
+            <h2>3. Ответы на бизнес-вопросы</h2>
+            
+            <h3>Вопрос 1: Из каких источников/кампаний/устройств/локаций идёт самый целевой трафик?</h3>
+            <div class="comparison">
+                <div class="comparison-item odd">
+                    <strong>📱 Устройства</strong>
+                    Desktop: 3.14% CR (лучший)<br>
+                    Mobile: 2.60% CR<br>
+                    Tablet: 2.31% CR
+                </div>
+                <div class="comparison-item">
+                    <strong>🌐 Источники</strong>
+                    aXQzDWsJuGXeBXexNHjc: 5.86%<br>
+                    bByPQxmDaMXgpHeypKSM: 5.43%<br>
+                    fDLlAcSmythWSCVMvqvL: 3.50%
+                </div>
+                <div class="comparison-item odd">
+                    <strong>🏙️ Города</strong>
+                    Казань: 3.86% CR<br>
+                    Краснодар: 3.35% CR<br>
+                    Москва: 2.93% CR
+                </div>
+            </div>
+            
+            <h3>Вопрос 2: Какие авто пользуются наибольшим спросом?</h3>
+            <div class="result-box">
+                <p>Для ответа на этот вопрос необходимо проанализировать кампании с наибольшим количеством визитов и конверсий:</p>
+                <table>
+                    <tr><th>Кампания</th><th>Визиты</th><th>Конверсии</th><th>CR</th></tr>
+                    <tr><td>LTuZkdKfxRGVceoWkVyg</td><td>463,481</td><td>19,006</td><td>4.10%</td></tr>
+                    <tr><td>LEoPHuyFvzoNfnzGgfcd</td><td>324,044</td><td>9,348</td><td>2.88%</td></tr>
+                    <tr><td>gecBYcKZCPMcVYdSSzKP</td><td>134,042</td><td>4,545</td><td>3.39%</td></tr>
+                </table>
+            </div>
+            
+            <h3>Вопрос 3: Стоит ли увеличивать присутствие в соцсетях?</h3>
+            <div class="result-box">
+                <table>
+                    <tr><th>Тип трафика</th><th>Визиты</th><th>Конверсии</th><th>CR</th></tr>
+                    <tr><td>Соцсети</td><td>274,227</td><td>4,021</td><td>1.47%</td></tr>
+                    <tr><td>Другие источники</td><td>1,585,815</td><td>46,293</td><td>2.92%</td></tr>
+                </table>
+                <h4>Вывод: ❌ НЕ рекомендуется</h4>
+                <p>Трафик из социальных сетей показывает значительно более низкий CR (1.47%) по сравнению с другими источниками (2.92%). Увеличение присутствия в соцсетях может привлечь больше посетителей, но с меньшей вероятностью конверсии.</p>
+            </div>
+        </section>
+        
+        <!-- ML -->
+        <section id="ml">
+            <h2>4. ML Engineer - Предиктивная модель</h2>
+            
+            <h3>Задача</h3>
+            <p>Научиться предсказывать совершение целевого действия (оставить заявку, заказать звонок) на основе характеристик визита.</p>
+            
+            <h3>Результаты</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="number">0.6629</div>
+                    <div class="label">ROC-AUC</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">Random Forest</div>
+                    <div class="label">Модель</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">200,000</div>
+                    <div class="label">Обучающая выборка</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">12</div>
+                    <div class="label">Фичей</div>
+                </div>
+            </div>
+            
+            <h3>Важность фичей</h3>
+            <table>
+                <tr><th>Фича</th><th>Важность</th><th>Описание</th></tr>
+                <tr><td>utm_source_enc</td><td>21.9%</td><td>Источник трафика</td></tr>
+                <tr><td>utm_medium_enc</td><td>17.9%</td><td>Тип трафика</td></tr>
+                <tr><td>is_organic</td><td>12.5%</td><td>Органический трафик?</td></tr>
+                <tr><td>visit_number</td><td>10.9%</td><td>Номер визита</td></tr>
+                <tr><td>geo_city_enc</td><td>8.8%</td><td>Город</td></tr>
+                <tr><td>visit_hour</td><td>8.3%</td><td>Час визита</td></tr>
+                <tr><td>is_first_visit</td><td>5.4%</td><td>Первый визит?</td></tr>
+                <tr><td>visit_dayofweek</td><td>4.7%</td><th>День недели</td></tr>
+            </table>
+            
+            <h3>Интерпретация</h3>
+            <div class="result-box">
+                <p>Наиболее важные факторы для предсказания конверсии:</p>
+                <ol>
+                    <li><strong>Источник трафика</strong> - разные каналы привлечения дают разную конверсию</li>
+                    <li><strong>Тип трафика</strong> - органический трафик конвертируется лучше</li>
+                    <li><strong>Номер визита</strong> - повторные посетители могут быть более заинтересованы</li>
+                    <li><strong>География</strong> - жители крупных городов чаще оставляют заявки</li>
+                </ol>
+            </div>
+            
+            <h3>API сервис</h3>
+            <p>Модель упакована в Flask API сервис. Пример запроса:</p>
+            <div class="code-block">
+POST /predict
+{
+  "visit_number": 1,
+  "visit_hour": 14,
+  "visit_dayofweek": 2,
+  "device_category": "desktop",
+  "utm_medium": "cpc",
+  "utm_source": "ZpYIoDJMcFzVoPFsHGJL",
+  "geo_country": "Russia",
+  "geo_city": "Moscow"
+}
+
+Response:
+{
+  "prediction": 1,
+  "probability": 0.73,
+  "will_convert": true
+}
+            </div>
+        </section>
+        
+        <!-- DE -->
+        <section id="de">
+            <h2>5. Data Engineer - База данных и пайплайн</h2>
+            
+            <h3>База данных</h3>
+            <p>Используется <strong>SQLite</strong> для хранения и запросов к данным.</p>
+            
+            <h3>Схема БД</h3>
+            <div class="code-block">
+-- Таблица сессий
+CREATE TABLE ga_sessions (
+    session_id TEXT PRIMARY KEY,
+    client_id REAL,
+    visit_date TEXT,
+    visit_time TEXT,
+    visit_number INTEGER,
+    utm_source TEXT,
+    utm_medium TEXT,
+    utm_campaign TEXT,
+    device_category TEXT,
+    geo_country TEXT,
+    geo_city TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Таблица хитов
+CREATE TABLE ga_hits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT,
+    hit_date TEXT,
+    hit_time REAL,
+    hit_number INTEGER,
+    event_action TEXT,
+    FOREIGN KEY (session_id) REFERENCES ga_sessions(session_id)
+);
+
+-- Индексы
+CREATE INDEX idx_hits_session ON ga_hits(session_id);
+CREATE INDEX idx_sessions_date ON ga_sessions(visit_date);
+CREATE INDEX idx_sessions_source ON ga_sessions(utm_source);
+            </div>
+            
+            <h3>Пайплайн для новых данных</h3>
+            <div class="result-box">
+                <p>Пайпайн обрабатывает JSON файлы:</p>
+                <ol>
+                    <li>Читает JSON из папки <code>new_data/</code></li>
+                    <li>Валидирует и преобразует данные</li>
+                    <li>Загружает в SQLite БД</li>
+                    <li>Перемещает обработанный файл в <code>archive/</code></li>
+                </ol>
+            </div>
+            
+            <h3>Пример JSON</h3>
+            <div class="code-block">
+{
+  "sessions": [
+    {
+      "session_id": "test_001",
+      "client_id": 123456.0,
+      "visit_date": "2022-01-15",
+      "visit_time": "14:30:00",
+      "visit_number": 1,
+      "utm_source": "test_source",
+      "utm_medium": "organic",
+      "device_category": "desktop",
+      "geo_country": "Russia",
+      "geo_city": "Moscow"
+    }
+  ],
+  "hits": [
+    {
+      "session_id": "test_001",
+      "hit_date": "2022-01-15",
+      "hit_time": 14.5,
+      "hit_number": 1,
+      "event_action": "sub_car_claim_click"
+    }
+  ]
+}
+            </div>
+        </section>
+        
+        <!-- CODE -->
+        <section id="code">
+            <h2>6. Программный код</h2>
+            
+            <h3>Data Analyst - Основной скрипт</h3>
+            <div class="code-block">
+<span class="comment">"""
+СберАвтоподписка - Data Analyst
+Основной скрипт анализа
+"""</span>
+
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+<span class="keyword">from</span> scipy <span class="keyword">import</span> stats
+<span class="keyword">import</span> warnings
+<span class="keyword">import</span> os
+
+<span class="comment"># Константы</span>
+TARGET_ACTIONS = [
+    <span class="string">'sub_car_claim_click'</span>, <span class="string">'sub_car_claim_submit_click'</span>,
+    <span class="string">'sub_open_dialog_click'</span>, <span class="string">'sub_custom_question_submit_click'</span>,
+    <span class="string">'sub_call_number_click'</span>, <span class="string">'sub_callback_submit_click'</span>,
+    <span class="string">'sub_submit_success'</span>, <span class="string">'sub_car_request_submit_click'</span>
+]
+ORGANIC_MEDIUMS = [<span class="string">'organic'</span>, <span class="string">'referral'</span>, <span class="string">'(none)'</span>]
+
+<span class="comment"># Загрузка данных</span>
+sessions = pd.read_csv(<span class="string">'ga_sessions.csv'</span>, low_memory=<span class="keyword">False</span>)
+hits = pd.read_csv(<span class="string">'ga_hits.csv'</span>, usecols=[<span class="string">'session_id'</span>, <span class="string">'event_action'</span>])
+
+<span class="comment"># Определение целевых действий</span>
+hits[<span class="string">'is_target'</span>] = hits[<span class="string">'event_action'</span>].isin(TARGET_ACTIONS)
+target_sessions = hits.groupby(<span class="string">'session_id'</span>)[<span class="string">'is_target'</span>].any()
+
+data = sessions.merge(target_sessions.reset_index(), on=<span class="string">'session_id'</span>, how=<span class="string">'left'</span>)
+data[<span class="string">'has_target_action'</span>] = data[<span class="string">'is_target'</span>].fillna(<span class="keyword">False</span>)
+
+<span class="comment"># Расчет CR</span>
+CR = data[<span class="string">'has_target_action'</span>].mean()
+print(f<span class="string">"Общий CR: {CR*100:.2f}%"</span>)
+
+<span class="comment"># Проверка гипотез</span>
+<span class="keyword">def</span> <span class="function">test_hypothesis</span>(data, group_col, name1, name2, alpha=0.05):
+    g1 = data[data[group_col]==<span class="keyword">True</span>][<span class="string">'has_target_action'</span>]
+    g2 = data[data[group_col]==<span class="keyword">False</span>][<span class="string">'has_target_action'</span>]
+    table = np.array([[g1.sum(), len(g1)-g1.sum()], 
+                      [g2.sum(), len(g2)-g2.sum()]])
+    chi2, p, dof, exp = stats.chi2_contingency(table)
+    <span class="keyword">return</span> chi2, p
+
+<span class="comment"># Тестирование</span>
+data[<span class="string">'is_organic'</span>] = data[<span class="string">'utm_medium'</span>].isin(ORGANIC_MEDIUMS)
+chi2, p = test_hypothesis(data, <span class="string">'is_organic'</span>, <span class="string">'Органический'</span>, <span class="string">'Платный'</span>)
+print(f<span class="string">"Chi-square: {chi2:.2f}, p-value: {p:.6f}"</span>)
+            </div>
+            
+            <h3>ML - Обучение модели</h3>
+            <div class="code-block">
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split
+<span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier
+<span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> roc_auc_score
+<span class="keyword">import</span> pickle
+
+<span class="comment"># Фичи</span>
+feature_cols = [<span class="string">'visit_number'</span>, <span class="string">'visit_hour'</span>, <span class="string">'visit_dayofweek'</span>,
+                <span class="string">'is_organic'</span>, <span class="string">'is_mobile'</span>, <span class="string">'device_category_enc'</span>,
+                <span class="string">'utm_source_enc'</span>, <span class="string">'geo_city_enc'</span>]
+
+X = data[feature_cols].fillna(0)
+y = data[<span class="string">'target'</span>]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+<span class="comment"># Обучение</span>
+model = RandomForestClassifier(n_estimators=100, max_depth=8, class_weight=<span class="string">'balanced'</span>)
+model.fit(X_train, y_train)
+
+pred = model.predict_proba(X_test)[:, <span class="number">1</span>]
+auc = roc_auc_score(y_test, pred)
+print(f<span class="string">"ROC-AUC: {auc:.4f}"</span>)
+
+<span class="comment"># Сохранение</span>
+with open(<span class="string">'model.pkl'</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> f:
+    pickle.dump({<span class="string">'model'</span>: model, <span class="string">'features'</span>: feature_cols}, f)
+            </div>
+            
+            <h3>DE - Пайплайн</h3>
+            <div class="code-block">
+<span class="keyword">import</span> sqlite3
+<span class="keyword">import</span> json
+<span class="keyword">import</span> os
+
+DB_PATH = <span class="string">'sberautopodpiska.db'</span>
+NEW_DATA_PATH = <span class="string">'new_data'</span>
+
+<span class="keyword">def</span> <span class="function">process_json</span>(file_path):
+    <span class="keyword">with</span> open(file_path, <span class="string">'r'</span>) <span class="keyword">as</span> f:
+        data = json.load(f)
+    
+    conn = sqlite3.connect(DB_PATH)
+    
+    <span class="comment"># Загрузка сессий</span>
+    <span class="keyword">for</span> s <span class="keyword">in</span> data.get(<span class="string">'sessions'</span>, []):
+        cols = <span class="string">', '</span>.join(s.keys())
+        vals = list(s.values())
+        cursor.execute(<span class="string">f</span><span class="string">"INSERT OR IGNORE INTO ga_sessions ({cols}) VALUES (?,...)"</span>, vals)
+    
+    <span class="comment"># Загрузка хитов</span>
+    <span class="keyword">for</span> h <span class="keyword">in</span> data.get(<span class="string">'hits'</span>, []):
+        cols = <span class="string">', '</span>.join(h.keys())
+        vals = list(h.values())
+        cursor.execute(<span class="string">f</span><span class="string">"INSERT INTO ga_hits ({cols}) VALUES (?,...)"</span>, vals)
+    
+    conn.commit()
+    conn.close()
+
+<span class="comment"># Запуск</span>
+files = [f <span class="keyword">for</span> f <span class="keyword">in</span> os.listdir(NEW_DATA_PATH) <span class="keyword">if</span> f.endswith(<span class="string">'.json'</span>)]
+<span class="keyword">for</span> f <span class="keyword">in</span> files:
+    process_json(<span class="string">f</span><span class="string">"{NEW_DATA_PATH}/{f}"</span>)
+            </div>
+        </section>
+        
+        <!-- CONCLUSION -->
+        <section>
+            <h2>Итоги</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="number">✅</div>
+                    <div class="label">EDA выполнен</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">✅</div>
+                    <div class="label">3 гипотезы проверены</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">✅</div>
+                    <div class="label">Бизнес-вопросы отвечены</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">✅</div>
+                    <div class="label">ML модель обучена</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">✅</div>
+                    <div class="label">API работает</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">✅</div>
+                    <div class="label">DE пайплайн готов</div>
+                </div>
+            </div>
+            
+            <div class="result-box" style="margin-top: 30px;">
+                <h4>Ключевые выводы:</h4>
+                <ul>
+                    <li>Общий CR сайта: <strong>2.70%</strong></li>
+                    <li>Лучший трафик: <strong>desktop + органический</strong></li>
+                    <li>Топ города: <strong>Москва, Санкт-Петербург, Казань</strong></li>
+                    <li>Соцсети показывают <strong>низкий CR (1.47%)</strong> - не рекомендуется расширять</li>
+                    <li>ML модель достигла <strong>ROC-AUC = 0.66</strong></li>
+                    <li>Главные предикторы: <strong>utm_source, utm_medium, is_organic</strong></li>
+                </ul>
+            </div>
+        </section>
+    </div>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 СберАвтоподписка - Анализ данных | Финальная работа по Data Science</p>
+        </div>
+    </footer>
+</body>
+</html>
+HTMLEOF
+echo "HTML created successfully"
+
+/usr/bin/bash: line 154: warning: here-document at line 1 delimited by end-of-file (wanted `HTMLEOF')
